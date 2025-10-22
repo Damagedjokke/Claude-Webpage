@@ -16,8 +16,28 @@
             background: linear-gradient(135deg, #1a0933 0%, #2d1b4e 50%, #1a0933 100%);
             color: #e0d4f7;
             min-height: 100vh;
-            overflow-x: hidden;
             position: relative;
+            transition: background 1s ease;
+        }
+
+        body.realm-fire {
+            background: linear-gradient(135deg, #4a0000 0%, #8b0000 50%, #4a0000 100%);
+        }
+
+        body.realm-ice {
+            background: linear-gradient(135deg, #001a33 0%, #003d5c 50%, #001a33 100%);
+        }
+
+        body.realm-nature {
+            background: linear-gradient(135deg, #0a2e0a 0%, #1a4d1a 50%, #0a2e0a 100%);
+        }
+
+        body.realm-light {
+            background: linear-gradient(135deg, #4a4a00 0%, #8b8b00 50%, #4a4a00 100%);
+        }
+
+        body.realm-shadow {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
         }
 
         .stars {
@@ -81,6 +101,8 @@
             margin: 30px 0;
             box-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
             backdrop-filter: blur(10px);
+            position: relative;
+            min-height: 300px;
         }
 
         h2 {
@@ -138,24 +160,31 @@
             text-align: center;
         }
 
-        .crystals-container {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
-            margin: 30px 0;
-        }
-
-        .crystal {
-            width: 60px;
-            height: 60px;
+        /* Floating crystals scattered around */
+        .floating-crystal {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            font-size: 35px;
             cursor: pointer;
-            transition: all 0.3s;
+            z-index: 100;
+            animation: float 3s ease-in-out infinite, sparkle 2s ease-in-out infinite;
             filter: drop-shadow(0 0 10px currentColor);
+            transition: all 0.3s;
         }
 
-        .crystal:hover {
-            transform: scale(1.2) rotate(10deg);
+        .floating-crystal:hover {
+            transform: scale(1.4) rotate(20deg);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes sparkle {
+            0%, 100% { filter: drop-shadow(0 0 5px currentColor); }
+            50% { filter: drop-shadow(0 0 20px currentColor); }
         }
 
         .score {
@@ -175,6 +204,7 @@
             cursor: pointer;
             transition: all 0.3s;
             box-shadow: 0 0 40px rgba(139, 92, 246, 0.8), inset 0 0 40px rgba(139, 92, 246, 0.5);
+            position: relative;
         }
 
         .portal:hover {
@@ -187,12 +217,43 @@
             to { transform: rotate(360deg); }
         }
 
+        .portal::after {
+            content: '🌀';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3em;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+        }
+
         #portal-message {
             text-align: center;
             font-size: 1.2em;
             color: #a78bfa;
             margin-top: 20px;
             min-height: 30px;
+        }
+
+        #realm-effect {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0;
+            transition: opacity 1s;
+        }
+
+        #realm-effect.active {
+            opacity: 1;
         }
 
         .quest-list {
@@ -227,6 +288,7 @@
             position: fixed;
             pointer-events: none;
             animation: float-up 3s ease-out forwards;
+            z-index: 999;
         }
 
         @keyframes float-up {
@@ -296,10 +358,85 @@
             margin-bottom: 10px;
             color: #e0d4f7;
         }
+
+        .crystal-hint {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(139, 92, 246, 0.9);
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-size: 1.1em;
+            z-index: 100;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.5);
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Easter egg - mysterious water */
+        .mysterious-water {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            font-size: 60px;
+            cursor: pointer;
+            z-index: 95;
+            animation: gentle-wave 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 15px #00bfff);
+            transition: all 0.5s;
+        }
+
+        .mysterious-water:hover {
+            transform: scale(1.1);
+        }
+
+        .mysterious-water.frozen {
+            animation: none;
+            filter: drop-shadow(0 0 20px #00ffff);
+        }
+
+        .mysterious-water.melting {
+            animation: melt 2s ease-out forwards;
+        }
+
+        @keyframes gentle-wave {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
+
+        @keyframes melt {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(2) translateY(50px); opacity: 0; }
+        }
+
+        .easter-egg-hint {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: #ffd700;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 96;
+            animation: fadeIn 0.3s;
+        }
     </style>
 </head>
 <body>
     <div class="stars" id="stars"></div>
+    <div id="realm-effect"></div>
     
     <div id="story-overlay" onclick="closeStory()"></div>
     <div id="story-popup">
@@ -346,7 +483,7 @@
                 </li>
                 <li class="quest-item" id="quest-1">
                     <strong>Quest II:</strong> Gather the Crystal Shards
-                    <div style="font-size: 0.9em; color: #b8a8d8; margin-top: 5px;">Collect 10 mystical crystals scattered throughout the realm</div>
+                    <div style="font-size: 0.9em; color: #b8a8d8; margin-top: 5px;">Collect 10 mystical crystals hidden throughout the realm</div>
                 </li>
                 <li class="quest-item" id="quest-2">
                     <strong>Quest III:</strong> Journey Through the Portal
@@ -367,6 +504,7 @@
             <h2>🔮 Cast Your Spells</h2>
             <div class="spell-casting">
                 <p>Choose a spell to cast and witness the magic unfold!</p>
+                <p style="color: #b8a8d8; font-size: 0.95em; margin-top: 10px; font-style: italic;">💡 Hint: Your spells can interact with mysterious objects in the realm...</p>
                 <div class="spell-buttons">
                     <button class="spell-btn" onclick="castSpell('fire')">🔥 Fireball</button>
                     <button class="spell-btn" onclick="castSpell('ice')">❄️ Ice Blast</button>
@@ -378,20 +516,45 @@
         </section>
 
         <section class="magic-section quest-content" style="display: none;">
-            <h2>💎 Crystal Collector</h2>
+            <h2>💎 Crystal Hunt</h2>
             <div class="crystal-game">
-                <p>Click the mystical crystals to collect them!</p>
-                <div class="score">Crystals Collected: <span id="crystal-count">0</span></div>
-                <div class="crystals-container" id="crystals"></div>
-                <button class="spell-btn" onclick="resetCrystals()">Reset Crystals</button>
+                <p>Mystical crystals are scattered throughout the realm!</p>
+                <p style="margin-top: 10px; color: #ffd700;">Scroll down and explore every corner to find them all.</p>
+                <div class="score">Crystals Collected: <span id="crystal-count">0</span> / 10</div>
+                <p style="margin-top: 15px; color: #b8a8d8; font-style: italic;">✨ Some crystals may be hidden in unexpected places...</p>
+            </div>
+        </section>
+
+        <section class="magic-section quest-content" style="display: none; min-height: 400px;">
+            <h2>🌊 The Mystic Lake</h2>
+            <div style="text-align: center; padding: 40px 20px;">
+                <p style="margin-bottom: 20px; font-size: 1.1em;">
+                    A serene lake reflects the stars above. Its waters seem to respond to magical energies...
+                </p>
+                <p style="color: #b8a8d8; font-style: italic; font-size: 0.95em;">
+                    "Ancient texts speak of crystals forming when elements clash with nature's gifts."
+                </p>
             </div>
         </section>
 
         <section class="magic-section quest-content" style="display: none;">
             <h2>🌀 The Portal</h2>
-            <p style="text-align: center;">Click the swirling portal to travel to distant realms...</p>
+            <p style="text-align: center;">Click the swirling portal to travel between realms. Each realm transforms the very essence of reality around you...</p>
             <div class="portal" onclick="enterPortal()"></div>
             <div id="portal-message"></div>
+            <div style="text-align: center; margin-top: 20px;">
+                <p style="color: #b8a8d8; font-size: 0.95em;">Current Realm: <span id="current-realm" style="color: #ffd700;">Mystic Realm</span></p>
+            </div>
+        </section>
+
+        <section class="magic-section quest-content" style="display: none; min-height: 500px;">
+            <h2>🏔️ The Ancient Peaks</h2>
+            <div style="text-align: center; padding: 40px 20px;">
+                <p style="font-size: 1.1em; line-height: 1.8;">
+                    Towering mountains pierce the clouds, their peaks shrouded in eternal mist. 
+                    Crystal veins glimmer within the ancient stone...
+                </p>
+            </div>
         </section>
 
         <footer>
@@ -406,7 +569,12 @@
             spellsCast: 0,
             spellTypes: new Set(),
             portalVisits: 0,
-            questsCompleted: [false, false, false, false, false]
+            questsCompleted: [false, false, false, false, false],
+            currentRealm: 'default',
+            crystalsSpawned: false,
+            waterState: 'liquid', // liquid, frozen, melted
+            easterEggFound: false,
+            lastSpellCast: null
         };
 
         const questStories = [
@@ -448,6 +616,214 @@
             document.getElementById('intro-section').style.display = 'none';
             document.querySelectorAll('.quest-content').forEach(el => el.style.display = 'block');
             showStory("🗡️ Your Journey Begins", "The realm awakens to your presence. The quest board materializes before you, ancient runes glowing with purpose. Study your tasks carefully, young mage—each completed quest will reveal another fragment of the realm's ancient mystery.");
+            
+            setTimeout(() => {
+                spawnFloatingCrystals();
+                createMysteriousWater();
+            }, 1000);
+        }
+
+        function createMysteriousWater() {
+            const sections = document.querySelectorAll('.magic-section');
+            const lakeSection = sections[4]; // The Mystic Lake section
+            
+            const water = document.createElement('div');
+            water.className = 'mysterious-water';
+            water.textContent = '💧';
+            water.id = 'mysterious-water';
+            water.style.left = '50%';
+            water.style.top = '60%';
+            water.style.transform = 'translateX(-50%)';
+            
+            water.onclick = function() {
+                interactWithWater();
+            };
+            
+            lakeSection.appendChild(water);
+        }
+
+        function interactWithWater() {
+            const water = document.getElementById('mysterious-water');
+            if (!water) return;
+
+            if (gameState.waterState === 'liquid') {
+                if (gameState.lastSpellCast === 'ice') {
+                    // Freeze the water
+                    gameState.waterState = 'frozen';
+                    water.textContent = '🧊';
+                    water.classList.add('frozen');
+                    showHint(water, "The water has frozen solid! 🧊");
+                    
+                    // Create ice particles
+                    for (let i = 0; i < 20; i++) {
+                        setTimeout(() => {
+                            const particle = document.createElement('div');
+                            particle.className = 'particle';
+                            particle.textContent = '❄️';
+                            particle.style.left = water.offsetLeft + water.offsetWidth / 2 + 'px';
+                            particle.style.top = water.offsetTop + water.offsetHeight / 2 + 'px';
+                            particle.style.fontSize = '20px';
+                            particle.style.color = '#00ffff';
+                            document.body.appendChild(particle);
+                            setTimeout(() => particle.remove(), 3000);
+                        }, i * 50);
+                    }
+                } else {
+                    showHint(water, "The water ripples... Perhaps ice magic?");
+                }
+            } else if (gameState.waterState === 'frozen') {
+                if (gameState.lastSpellCast === 'fire') {
+                    // Melt the ice and reveal crystal!
+                    gameState.waterState = 'melted';
+                    water.classList.add('melting');
+                    showHint(water, "The ice melts! A crystal emerges! 💎✨");
+                    
+                    // Create melting effect
+                    for (let i = 0; i < 15; i++) {
+                        setTimeout(() => {
+                            const particle = document.createElement('div');
+                            particle.className = 'particle';
+                            particle.textContent = ['💧', '🔥'][Math.floor(Math.random() * 2)];
+                            particle.style.left = water.offsetLeft + water.offsetWidth / 2 + 'px';
+                            particle.style.top = water.offsetTop + water.offsetHeight / 2 + 'px';
+                            particle.style.fontSize = '25px';
+                            document.body.appendChild(particle);
+                            setTimeout(() => particle.remove(), 3000);
+                        }, i * 80);
+                    }
+                    
+                    setTimeout(() => {
+                        water.remove();
+                        // Spawn the secret crystal!
+                        spawnSecretCrystal(water.offsetLeft, water.offsetTop);
+                        gameState.easterEggFound = true;
+                    }, 2000);
+                } else {
+                    showHint(water, "The ice is solid... Fire might melt it!");
+                }
+            }
+        }
+
+        function showHint(element, text) {
+            const hint = document.createElement('div');
+            hint.className = 'easter-egg-hint';
+            hint.textContent = text;
+            hint.style.left = element.offsetLeft + 'px';
+            hint.style.top = (element.offsetTop - 50) + 'px';
+            document.body.appendChild(hint);
+            setTimeout(() => hint.remove(), 3000);
+        }
+
+        function spawnSecretCrystal(x, y) {
+            const crystal = document.createElement('div');
+            crystal.className = 'floating-crystal';
+            crystal.textContent = '💎';
+            crystal.style.color = '#ff00ff';
+            crystal.style.fontSize = '50px';
+            crystal.style.left = x + 'px';
+            crystal.style.top = y + 'px';
+            crystal.style.animation = 'float 2s ease-in-out infinite, sparkle 1s ease-in-out infinite';
+            
+            crystal.onclick = function() {
+                collectFloatingCrystal(this, true);
+            };
+            
+            document.body.appendChild(crystal);
+
+            // Show special message
+            const hint = document.createElement('div');
+            hint.className = 'crystal-hint';
+            hint.textContent = '🎉 Secret Crystal Unlocked! You discovered the elemental puzzle!';
+            hint.style.background = 'linear-gradient(135deg, #ff00ff, #00ffff)';
+            document.body.appendChild(hint);
+            setTimeout(() => hint.remove(), 5000);
+        }
+
+        function spawnFloatingCrystals() {
+            if (gameState.crystalsSpawned) return;
+            gameState.crystalsSpawned = true;
+
+            const crystalEmojis = ['💎', '💠', '🔷', '🔹', '💙', '💜', '🔮', '✨', '⭐'];
+            const colors = ['#00ffff', '#ff00ff', '#00ff00', '#ffff00', '#ff0080', '#0080ff', '#ff8000', '#8000ff', '#00ff80'];
+            
+            const sections = document.querySelectorAll('.magic-section');
+            
+            // Spawn crystals in different sections
+            const spawnPositions = [
+                { section: 1, x: '15%', y: '150px' },
+                { section: 2, x: '85%', y: '200px' },
+                { section: 3, x: '25%', y: '250px' },
+                { section: 3, x: '75%', y: '100px' },
+                { section: 4, x: '10%', y: '180px' },
+                { section: 5, x: '90%', y: '220px' },
+                { section: 5, x: '50%', y: '350px' },
+                { section: 6, x: '20%', y: '280px' },
+                { section: 6, x: '80%', y: '150px' }
+            ];
+            
+            spawnPositions.forEach((pos, i) => {
+                setTimeout(() => {
+                    const crystal = document.createElement('div');
+                    crystal.className = 'floating-crystal';
+                    crystal.textContent = crystalEmojis[i];
+                    crystal.style.color = colors[i];
+                    
+                    crystal.style.left = pos.x;
+                    crystal.style.top = pos.y;
+                    
+                    crystal.style.animationDelay = Math.random() * 3 + 's';
+                    
+                    crystal.onclick = function() {
+                        collectFloatingCrystal(this, false);
+                    };
+                    
+                    sections[pos.section].appendChild(crystal);
+                }, i * 300);
+            });
+
+            const hint = document.createElement('div');
+            hint.className = 'crystal-hint';
+            hint.textContent = '✨ Crystals have appeared! Scroll to explore!';
+            document.body.appendChild(hint);
+            setTimeout(() => hint.remove(), 4000);
+        }
+
+        function collectFloatingCrystal(element, isSecret) {
+            gameState.crystalCount++;
+            document.getElementById('crystal-count').textContent = gameState.crystalCount;
+            
+            element.style.transition = 'all 0.6s';
+            element.style.transform = 'scale(3) rotate(720deg)';
+            element.style.opacity = '0';
+            
+            for (let i = 0; i < 15; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'particle';
+                sparkle.textContent = '✨';
+                const angle = (i / 15) * Math.PI * 2;
+                const distance = 80;
+                sparkle.style.left = element.offsetLeft + element.offsetWidth / 2 + Math.cos(angle) * distance + 'px';
+                sparkle.style.top = element.offsetTop + element.offsetHeight / 2 + Math.sin(angle) * distance + 'px';
+                sparkle.style.fontSize = '30px';
+                sparkle.style.color = element.style.color;
+                document.body.appendChild(sparkle);
+                setTimeout(() => sparkle.remove(), 3000);
+            }
+            
+            setTimeout(() => {
+                element.remove();
+            }, 600);
+
+            if (isSecret) {
+                const hint = document.createElement('div');
+                hint.className = 'crystal-hint';
+                hint.textContent = '🏆 Bonus Crystal! +1';
+                hint.style.background = 'linear-gradient(135deg, #ffd700, #ff8c00)';
+                document.body.appendChild(hint);
+                setTimeout(() => hint.remove(), 3000);
+            }
+
+            checkQuests();
         }
 
         function showStory(title, text) {
@@ -537,6 +913,7 @@
         function castSpell(spellType) {
             gameState.spellsCast++;
             gameState.spellTypes.add(spellType);
+            gameState.lastSpellCast = spellType;
             
             const messages = spellMessages[spellType];
             const message = messages[Math.floor(Math.random() * messages.length)];
@@ -583,90 +960,91 @@
             }
         }
 
-        const crystalEmojis = ['💎', '💠', '🔷', '🔹', '💙', '💜'];
-        
-        function createCrystals() {
-            const container = document.getElementById('crystals');
-            container.innerHTML = '';
-            
-            for (let i = 0; i < 12; i++) {
-                const crystal = document.createElement('div');
-                crystal.className = 'crystal';
-                crystal.textContent = crystalEmojis[Math.floor(Math.random() * crystalEmojis.length)];
-                crystal.style.color = `hsl(${Math.random() * 360}, 70%, 60%)`;
-                crystal.onclick = function() {
-                    collectCrystal(this);
-                };
-                container.appendChild(crystal);
-            }
-        }
-
-        function collectCrystal(element) {
-            gameState.crystalCount++;
-            document.getElementById('crystal-count').textContent = gameState.crystalCount;
-            
-            element.style.transition = 'all 0.5s';
-            element.style.transform = 'scale(2) translateY(-50px)';
-            element.style.opacity = '0';
-            
-            setTimeout(() => {
-                element.remove();
-            }, 500);
-
-            for (let i = 0; i < 5; i++) {
-                const sparkle = document.createElement('div');
-                sparkle.className = 'particle';
-                sparkle.textContent = '✨';
-                sparkle.style.left = element.offsetLeft + element.offsetWidth / 2 + 'px';
-                sparkle.style.top = element.offsetTop + element.offsetHeight / 2 + 'px';
-                sparkle.style.fontSize = '20px';
-                document.body.appendChild(sparkle);
-                setTimeout(() => sparkle.remove(), 3000);
-            }
-
-            checkQuests();
-        }
-
-        function resetCrystals() {
-            createCrystals();
-        }
-
         const realms = [
-            "You've entered the Ethereal Forest! Ancient trees whisper secrets...",
-            "Welcome to the Crystal Caverns! Gems glitter in every direction...",
-            "You've arrived at the Floating Islands! Clouds drift beneath your feet...",
-            "The Shadow Realm embraces you! Mysterious figures lurk in the darkness...",
-            "You stand in the Temple of Light! Divine energy fills the air...",
-            "The Dragon's Peak! A mighty roar echoes through the mountains...",
-            "The Starfall Plains stretch before you! Meteorites paint the sky...",
-            "You've found the Enchanted Library! Infinite knowledge awaits..."
+            {
+                name: 'Realm of Eternal Flames',
+                class: 'realm-fire',
+                message: "🔥 You step through into a world of endless fire! Lava flows like rivers, and the air shimmers with heat. Ancient dragons circle overhead...",
+                emoji: '🔥'
+            },
+            {
+                name: 'Frozen Dimension',
+                class: 'realm-ice',
+                message: "❄️ The portal opens to a crystalline winter wonderland! Frost coats everything, and auroras dance across frozen skies...",
+                emoji: '❄️'
+            },
+            {
+                name: 'Verdant Paradise',
+                class: 'realm-nature',
+                message: "🌿 You emerge in an ancient forest realm! Massive trees reach toward the heavens, and magical creatures frolic among glowing flowers...",
+                emoji: '🌿'
+            },
+            {
+                name: 'Celestial Heights',
+                class: 'realm-light',
+                message: "✨ The portal brings you to a realm of pure light! Golden clouds drift beneath your feet, and divine music fills the air...",
+                emoji: '✨'
+            },
+            {
+                name: 'Shadow Depths',
+                class: 'realm-shadow',
+                message: "🌑 You enter the mysterious shadow realm! Darkness swirls around you, revealing glimpses of hidden truths and ancient secrets...",
+                emoji: '🌑'
+            }
         ];
 
         function enterPortal() {
             gameState.portalVisits++;
             const realm = realms[Math.floor(Math.random() * realms.length)];
-            const messageDiv = document.getElementById('portal-message');
             
-            messageDiv.textContent = realm;
+            document.body.className = realm.class;
+            document.getElementById('current-realm').textContent = realm.name;
+            
+            const messageDiv = document.getElementById('portal-message');
+            messageDiv.textContent = realm.message;
             messageDiv.style.animation = 'glow 2s ease-in-out';
             
-            for (let i = 0; i < 20; i++) {
+            const effectDiv = document.getElementById('realm-effect');
+            effectDiv.className = 'active';
+            effectDiv.innerHTML = '';
+            
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.textContent = realm.emoji;
+                    particle.style.left = Math.random() * window.innerWidth + 'px';
+                    particle.style.top = Math.random() * window.innerHeight + 'px';
+                    particle.style.fontSize = Math.random() * 40 + 20 + 'px';
+                    effectDiv.appendChild(particle);
+                }, i * 30);
+            }
+            
+            for (let i = 0; i < 30; i++) {
                 setTimeout(() => {
                     const particle = document.createElement('div');
                     particle.className = 'particle';
                     particle.textContent = '🌟';
-                    particle.style.left = window.innerWidth / 2 + 'px';
-                    particle.style.top = '50%';
+                    const angle = (i / 30) * Math.PI * 2;
+                    const distance = 50 + i * 10;
+                    particle.style.left = (window.innerWidth / 2 + Math.cos(angle) * distance) + 'px';
+                    particle.style.top = (window.innerHeight / 2 + Math.sin(angle) * distance) + 'px';
                     particle.style.fontSize = Math.random() * 30 + 20 + 'px';
                     document.body.appendChild(particle);
                     setTimeout(() => particle.remove(), 3000);
                 }, i * 50);
             }
+            
+            setTimeout(() => {
+                effectDiv.classList.remove('active');
+                setTimeout(() => {
+                    document.body.className = '';
+                    document.getElementById('current-realm').textContent = 'Mystic Realm';
+                }, 1000);
+            }, 10000);
 
             checkQuests();
         }
-
-        createCrystals();
     </script>
 </body>
 </html>

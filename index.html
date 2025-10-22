@@ -20,7 +20,6 @@
             position: relative;
         }
 
-        /* Animated stars */
         .stars {
             position: fixed;
             top: 0;
@@ -91,7 +90,6 @@
             text-align: center;
         }
 
-        /* Spell casting area */
         .spell-casting {
             text-align: center;
             padding: 20px;
@@ -136,7 +134,6 @@
             text-shadow: 0 0 10px #ffd700;
         }
 
-        /* Crystal collector game */
         .crystal-game {
             text-align: center;
         }
@@ -167,7 +164,6 @@
             margin: 20px 0;
         }
 
-        /* Magic portal */
         .portal {
             width: 200px;
             height: 200px;
@@ -199,7 +195,6 @@
             min-height: 30px;
         }
 
-        /* Quest log */
         .quest-list {
             list-style: none;
             margin-top: 20px;
@@ -211,13 +206,7 @@
             margin: 10px 0;
             border-radius: 8px;
             border-left: 4px solid #8b5cf6;
-            cursor: pointer;
             transition: all 0.3s;
-        }
-
-        .quest-item:hover {
-            background: rgba(139, 92, 246, 0.4);
-            transform: translateX(10px);
         }
 
         .quest-item.completed {
@@ -234,7 +223,6 @@
             font-style: italic;
         }
 
-        /* Particle effects */
         .particle {
             position: fixed;
             pointer-events: none;
@@ -247,10 +235,78 @@
                 opacity: 0;
             }
         }
+
+        #story-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 999;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        #story-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(26, 9, 51, 0.98);
+            border: 3px solid #ffd700;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            z-index: 1000;
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.6);
+            animation: popIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes popIn {
+            from {
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        #story-title {
+            color: #ffd700;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 2em;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        #story-text {
+            line-height: 1.8;
+            font-size: 1.1em;
+            text-align: center;
+            margin-bottom: 10px;
+            color: #e0d4f7;
+        }
     </style>
 </head>
 <body>
     <div class="stars" id="stars"></div>
+    
+    <div id="story-overlay" onclick="closeStory()"></div>
+    <div id="story-popup">
+        <h3 id="story-title"></h3>
+        <p id="story-text"></p>
+        <button class="spell-btn" onclick="closeStory()" style="margin-top: 30px; display: block; margin-left: auto; margin-right: auto;">Continue Your Journey</button>
+    </div>
     
     <div class="container">
         <header>
@@ -258,7 +314,6 @@
             <p class="subtitle">Welcome, Wanderer of the Arcane</p>
         </header>
 
-        <!-- Story Introduction -->
         <section class="magic-section" id="intro-section">
             <h2>📖 Your Journey Begins</h2>
             <div style="text-align: center; line-height: 1.8; font-size: 1.1em;">
@@ -277,17 +332,6 @@
                     Begin Your Quest
                 </button>
             </div>
-        </section>
-
-
-        <!-- Spell Casting Section -->
-        <section class="magic-section" id="main-content" style="display: none;">
-            <div id="story-popup" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(26, 9, 51, 0.98); border: 3px solid #ffd700; border-radius: 20px; padding: 40px; max-width: 600px; z-index: 1000; box-shadow: 0 0 50px rgba(255, 215, 0, 0.6);">
-                <h3 style="color: #ffd700; margin-bottom: 20px; text-align: center;" id="story-title"></h3>
-                <p style="line-height: 1.8; font-size: 1.1em; text-align: center;" id="story-text"></p>
-                <button class="spell-btn" onclick="closeStory()" style="margin-top: 30px; display: block; margin-left: auto; margin-right: auto;">Continue</button>
-            </div>
-            <div id="story-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 999;" onclick="closeStory()"></div>
         </section>
 
         <section class="magic-section quest-content" style="display: none;">
@@ -333,7 +377,6 @@
             </div>
         </section>
 
-        <!-- Crystal Collector Game -->
         <section class="magic-section quest-content" style="display: none;">
             <h2>💎 Crystal Collector</h2>
             <div class="crystal-game">
@@ -344,7 +387,6 @@
             </div>
         </section>
 
-        <!-- Magic Portal -->
         <section class="magic-section quest-content" style="display: none;">
             <h2>🌀 The Portal</h2>
             <p style="text-align: center;">Click the swirling portal to travel to distant realms...</p>
@@ -359,7 +401,6 @@
     </div>
 
     <script>
-        // Game state
         let gameState = {
             crystalCount: 0,
             spellsCast: 0,
@@ -368,31 +409,29 @@
             questsCompleted: [false, false, false, false, false]
         };
 
-        // Story content for each quest
         const questStories = [
             {
-                title: "The First Spark",
+                title: "⚡ The First Spark",
                 text: "As you master each element, you feel ancient power flowing through your veins. The Crystal Guardians whisper their approval. Fire, ice, lightning, and life—you've proven yourself worthy of wielding their forces. But this is only the beginning..."
             },
             {
-                title: "Fragments of Power",
+                title: "💎 Fragments of Power",
                 text: "The crystals resonate in harmony, their combined energy revealing a vision: long ago, a great mage shattered the Eternal Crystal to prevent a dark force from claiming it. You've gathered enough fragments to sense its original power. The darkness stirs once more..."
             },
             {
-                title: "Between Worlds",
+                title: "🌀 Between Worlds",
                 text: "Each realm you visit leaves its mark upon your soul. You begin to understand—these aren't mere destinations, but echoes of what this realm once was. The portals are weakening, the boundaries between worlds growing thin. Time is running short."
             },
             {
-                title: "Elemental Mastery",
+                title: "🔥 Elemental Mastery",
                 text: "Your connection to the elements deepens with each spell. You no longer merely cast magic—you ARE magic. The realm responds to your presence, the very air shimmering with potential. The Crystal Guardians deem you ready for the final trial."
             },
             {
-                title: "The Prophecy Fulfilled",
-                text: "As the final quest completes, brilliant light erupts from within you. The crystal fragments unite, reforming the Eternal Crystal in your hands. You understand now—YOU are the guardian this realm has waited for. The darkness that once threatened to consume everything retreats before your radiance. Balance is restored, and the Mystic Realm flourishes once more. Your legend will be told for ages to come, brave mage. You are the realm's eternal protector, the one who answered destiny's call. Thank you for your courage."
+                title: "👑 The Prophecy Fulfilled",
+                text: "As the final quest completes, brilliant light erupts from within you. The crystal fragments unite, reforming the Eternal Crystal in your hands. You understand now—YOU are the guardian this realm has waited for. The darkness that once threatened to consume everything retreats before your radiance. Balance is restored, and the Mystic Realm flourishes once more. Your legend will be told for ages to come, brave mage. You are the realm's eternal protector, the one who answered destiny's call. Thank you for your courage. 🌟"
             }
         ];
 
-        // Create animated stars
         const starsContainer = document.getElementById('stars');
         for (let i = 0; i < 100; i++) {
             const star = document.createElement('div');
@@ -405,22 +444,18 @@
             starsContainer.appendChild(star);
         }
 
-        // Start journey
         function startJourney() {
             document.getElementById('intro-section').style.display = 'none';
             document.querySelectorAll('.quest-content').forEach(el => el.style.display = 'block');
-            document.getElementById('main-content').style.display = 'block';
-            showStory("Your Journey Begins", "The realm awakens to your presence. The quest board materializes before you, ancient runes glowing with purpose. Study your tasks carefully, young mage—each completed quest will reveal another piece of the realm's ancient mystery.");
+            showStory("🗡️ Your Journey Begins", "The realm awakens to your presence. The quest board materializes before you, ancient runes glowing with purpose. Study your tasks carefully, young mage—each completed quest will reveal another fragment of the realm's ancient mystery.");
         }
 
-        // Story popup system
         function showStory(title, text) {
             document.getElementById('story-title').textContent = title;
             document.getElementById('story-text').textContent = text;
             document.getElementById('story-popup').style.display = 'block';
             document.getElementById('story-overlay').style.display = 'block';
             
-            // Particle effect for story
             for (let i = 0; i < 30; i++) {
                 setTimeout(() => {
                     const particle = document.createElement('div');
@@ -441,45 +476,26 @@
             document.getElementById('story-overlay').style.display = 'none';
         }
 
-        // Quest completion checking
         function checkQuests() {
-            let newCompletion = false;
-
-            // Quest 0: Cast all four spell types
             if (!gameState.questsCompleted[0] && gameState.spellTypes.size >= 4) {
                 completeQuest(0);
-                newCompletion = true;
             }
-
-            // Quest 1: Collect 10 crystals
             if (!gameState.questsCompleted[1] && gameState.crystalCount >= 10) {
                 completeQuest(1);
-                newCompletion = true;
             }
-
-            // Quest 2: Enter portal 3 times
             if (!gameState.questsCompleted[2] && gameState.portalVisits >= 3) {
                 completeQuest(2);
-                newCompletion = true;
             }
-
-            // Quest 3: Cast 20 spells total
             if (!gameState.questsCompleted[3] && gameState.spellsCast >= 20) {
                 completeQuest(3);
-                newCompletion = true;
             }
-
-            // Quest 4: Complete all other quests
             if (!gameState.questsCompleted[4] && 
                 gameState.questsCompleted[0] && 
                 gameState.questsCompleted[1] && 
                 gameState.questsCompleted[2] && 
                 gameState.questsCompleted[3]) {
                 completeQuest(4);
-                newCompletion = true;
             }
-
-            return newCompletion;
         }
 
         function completeQuest(questIndex) {
@@ -487,17 +503,14 @@
             const questElement = document.getElementById(`quest-${questIndex}`);
             questElement.classList.add('completed');
             
-            // Update progress
             const completed = gameState.questsCompleted.filter(q => q).length;
             document.getElementById('quest-progress').textContent = `${completed}/5`;
 
-            // Show story after a brief delay
             setTimeout(() => {
                 showStory(questStories[questIndex].title, questStories[questIndex].text);
-            }, 500);
+            }, 800);
         }
 
-        // Spell casting functionality
         const spellMessages = {
             fire: [
                 "🔥 A mighty fireball erupts from your hands!",
@@ -570,7 +583,6 @@
             }
         }
 
-        // Crystal collector game
         const crystalEmojis = ['💎', '💠', '🔷', '🔹', '💙', '💜'];
         
         function createCrystals() {
@@ -593,7 +605,6 @@
             gameState.crystalCount++;
             document.getElementById('crystal-count').textContent = gameState.crystalCount;
             
-            // Animate collection
             element.style.transition = 'all 0.5s';
             element.style.transform = 'scale(2) translateY(-50px)';
             element.style.opacity = '0';
@@ -602,7 +613,6 @@
                 element.remove();
             }, 500);
 
-            // Create sparkles
             for (let i = 0; i < 5; i++) {
                 const sparkle = document.createElement('div');
                 sparkle.className = 'particle';
@@ -621,7 +631,6 @@
             createCrystals();
         }
 
-        // Portal functionality
         const realms = [
             "You've entered the Ethereal Forest! Ancient trees whisper secrets...",
             "Welcome to the Crystal Caverns! Gems glitter in every direction...",
@@ -641,7 +650,6 @@
             messageDiv.textContent = realm;
             messageDiv.style.animation = 'glow 2s ease-in-out';
             
-            // Create portal particles
             for (let i = 0; i < 20; i++) {
                 setTimeout(() => {
                     const particle = document.createElement('div');
@@ -658,7 +666,6 @@
             checkQuests();
         }
 
-        // Initialize crystals on page load
         createCrystals();
     </script>
 </body>

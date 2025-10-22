@@ -425,7 +425,7 @@
         }
 
         .completion-marker {
-            position: absolute;
+            position: fixed;
             background: linear-gradient(135deg, #10b981, #059669);
             color: white;
             padding: 12px 20px;
@@ -433,9 +433,10 @@
             font-weight: bold;
             font-size: 1em;
             box-shadow: 0 4px 15px rgba(16, 185, 129, 0.5);
-            z-index: 101;
+            z-index: 1001;
             animation: popIn 0.5s ease-out;
             border: 2px solid #34d399;
+            transform: translate(-50%, -50%);
         }
 
         /* Mountain rocks */
@@ -461,6 +462,25 @@
             0%, 100% { transform: rotate(0deg); }
             25% { transform: rotate(-5deg); }
             75% { transform: rotate(5deg); }
+        }
+
+        /* Crystal revelation animation */
+        .crystal-revealed {
+            animation: crystalReveal 1s ease-out forwards;
+        }
+
+        @keyframes crystalReveal {
+            0% {
+                transform: scale(0) translateY(20px);
+                opacity: 0;
+            }
+            60% {
+                transform: scale(1.3) translateY(0);
+            }
+            100% {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
         }
     </style>
 </head>
@@ -555,7 +575,7 @@
             </div>
         </section>
 
-        <section class="magic-section quest-content" style="display: none; min-height: 450px;">
+        <section class="magic-section quest-content" id="lake-section" style="display: none; min-height: 450px;">
             <h2>🌊 The Mystic Lake</h2>
             <div style="text-align: center; padding: 40px 20px;">
                 <p style="margin-bottom: 20px; font-size: 1.1em;">
@@ -665,8 +685,7 @@
         }
 
         function createMysteriousWater() {
-            const sections = document.querySelectorAll('.magic-section');
-            const lakeSection = sections[4];
+            const lakeSection = document.getElementById('lake-section');
             
             const water = document.createElement('div');
             water.className = 'mysterious-water';
@@ -713,7 +732,7 @@
             } else if (gameState.waterState === 'frozen') {
                 if (gameState.lastSpellCast === 'fire') {
                     gameState.waterState = 'melted';
-                    showHint(water, "The ice melts away! ✨");
+                    showHint(water, "The ice melts away, revealing something beneath! ✨");
                     
                     for (let i = 0; i < 15; i++) {
                         setTimeout(() => {
@@ -729,16 +748,16 @@
                     }
                     
                     setTimeout(() => {
+                        water.style.transition = 'all 1s';
                         water.style.opacity = '0';
+                        water.style.transform = 'translateX(-50%) scale(0)';
+                        
                         setTimeout(() => {
-                            const waterPos = {
-                                left: water.offsetLeft,
-                                top: water.offsetTop
-                            };
+                            const lakeSection = document.getElementById('lake-section');
                             water.remove();
-                            spawnSecretCrystal(waterPos.left, waterPos.top + 60);
+                            spawnSecretCrystal(lakeSection);
                             gameState.easterEggFound = true;
-                        }, 500);
+                        }, 1000);
                     }, 1500);
                 } else {
                     showHint(water, "The ice is solid... Fire might melt it!");
@@ -750,10 +769,11 @@
             const sections = document.querySelectorAll('.magic-section');
             const mountainSection = sections[6];
             
+            // Using more compatible emojis
             const rockPositions = [
-                { x: '20%', y: '60%', emoji: '🪨' },
+                { x: '20%', y: '60%', emoji: '⛰️' },
                 { x: '50%', y: '65%', emoji: '🗿' },
-                { x: '75%', y: '58%', emoji: '🪨' }
+                { x: '75%', y: '58%', emoji: '⛰️' }
             ];
             
             rockPositions.forEach((pos, index) => {
@@ -812,10 +832,11 @@
         function spawnRockCrystal(x, y) {
             const crystalEmojis = ['💎', '🔷', '✨'];
             const crystal = document.createElement('div');
-            crystal.className = 'floating-crystal';
+            crystal.className = 'floating-crystal crystal-revealed';
             crystal.textContent = crystalEmojis[gameState.rocksDestroyed % 3];
             crystal.style.color = '#ffd700';
             crystal.style.fontSize = '45px';
+            crystal.style.position = 'fixed';
             crystal.style.left = x + 'px';
             crystal.style.top = y + 'px';
             
@@ -836,25 +857,25 @@
             setTimeout(() => hint.remove(), 3000);
         }
 
-        function spawnSecretCrystal(x, y) {
+        function spawnSecretCrystal(lakeSection) {
             const crystal = document.createElement('div');
-            crystal.className = 'floating-crystal';
+            crystal.className = 'floating-crystal crystal-revealed';
             crystal.textContent = '💎';
             crystal.style.color = '#ff00ff';
             crystal.style.fontSize = '50px';
-            crystal.style.left = x + 'px';
-            crystal.style.top = y + 'px';
-            crystal.style.animation = 'float 2s ease-in-out infinite, sparkle 1s ease-in-out infinite';
+            crystal.style.left = '50%';
+            crystal.style.top = '65%';
+            crystal.style.transform = 'translateX(-50%)';
             
             crystal.onclick = function() {
                 collectFloatingCrystal(this, true);
             };
             
-            document.body.appendChild(crystal);
+            lakeSection.appendChild(crystal);
 
             const hint = document.createElement('div');
             hint.className = 'crystal-hint';
-            hint.textContent = '🎉 Secret Crystal! You solved the ice-fire puzzle!';
+            hint.textContent = '🎉 Secret Crystal Revealed! Click to collect it!';
             hint.style.background = 'linear-gradient(135deg, #ff00ff, #00ffff)';
             document.body.appendChild(hint);
             setTimeout(() => hint.remove(), 5000);
@@ -869,27 +890,20 @@
             
             const sections = document.querySelectorAll('.magic-section');
             
-            const spawnPositions = [
-                { section: 1, x: '15%', y: '150px' },
-                { section: 2, x: '85%', y: '200px' },
-                { section: 3, x: '25%', y: '250px' },
-                { section: 3, x: '75%', y: '100px' },
-                { section: 4, x: '10%', y: '180px' },
-                { section: 5, x: '90%', y: '220px' },
-                { section: 5, x: '50%', y: '350px' },
-                { section: 6, x: '20%', y: '280px' },
-                { section: 6, x: '80%', y: '150px' }
-            ];
-            
-            spawnPositions.forEach((pos, i) => {
+            // Random spawn positions for each crystal
+            for (let i = 0; i < 9; i++) {
                 setTimeout(() => {
                     const crystal = document.createElement('div');
                     crystal.className = 'floating-crystal';
                     crystal.textContent = crystalEmojis[i];
                     crystal.style.color = colors[i];
                     
-                    crystal.style.left = pos.x;
-                    crystal.style.top = pos.y;
+                    // Random section (skip intro section)
+                    const randomSection = Math.floor(Math.random() * 6) + 1;
+                    
+                    // Random position within section
+                    crystal.style.left = (Math.random() * 80 + 10) + '%';
+                    crystal.style.top = (Math.random() * 200 + 100) + 'px';
                     
                     crystal.style.animationDelay = Math.random() * 3 + 's';
                     
@@ -897,9 +911,9 @@
                         collectFloatingCrystal(this, false);
                     };
                     
-                    sections[pos.section].appendChild(crystal);
+                    sections[randomSection].appendChild(crystal);
                 }, i * 300);
-            });
+            }
 
             const hint = document.createElement('div');
             hint.className = 'crystal-hint';
@@ -912,6 +926,11 @@
             gameState.crystalCount++;
             document.getElementById('crystal-count').textContent = gameState.crystalCount;
             
+            // Get screen position before removing
+            const rect = element.getBoundingClientRect();
+            const screenX = rect.left + rect.width / 2;
+            const screenY = rect.top + rect.height / 2;
+            
             element.style.transition = 'all 0.6s';
             element.style.transform = 'scale(3) rotate(720deg)';
             element.style.opacity = '0';
@@ -922,31 +941,27 @@
                 sparkle.textContent = '✨';
                 const angle = (i / 15) * Math.PI * 2;
                 const distance = 80;
-                sparkle.style.left = element.offsetLeft + element.offsetWidth / 2 + Math.cos(angle) * distance + 'px';
-                sparkle.style.top = element.offsetTop + element.offsetHeight / 2 + Math.sin(angle) * distance + 'px';
+                sparkle.style.left = screenX + Math.cos(angle) * distance + 'px';
+                sparkle.style.top = screenY + Math.sin(angle) * distance + 'px';
                 sparkle.style.fontSize = '30px';
                 sparkle.style.color = element.style.color;
                 document.body.appendChild(sparkle);
                 setTimeout(() => sparkle.remove(), 3000);
             }
             
-            const crystalPos = {
-                left: element.offsetLeft,
-                top: element.offsetTop
-            };
-            
             setTimeout(() => {
                 element.remove();
                 
                 const marker = document.createElement('div');
                 marker.className = 'completion-marker';
-                marker.textContent = isSpecial ? '✅ Secret Discovered!' : '✅ Crystal Found!';
-                marker.style.left = crystalPos.left + 'px';
-                marker.style.top = crystalPos.top + 'px';
+                marker.textContent = isSpecial ? '✅ Secret Collected!' : '✅ Crystal Found!';
+                marker.style.left = screenX + 'px';
+                marker.style.top = screenY + 'px';
                 document.body.appendChild(marker);
                 
                 setTimeout(() => {
                     marker.style.opacity = '0';
+                    marker.style.transition = 'opacity 0.5s';
                     setTimeout(() => marker.remove(), 500);
                 }, 2000);
             }, 600);

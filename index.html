@@ -406,18 +406,9 @@
             filter: drop-shadow(0 0 20px #00ffff);
         }
 
-        .mysterious-water.melting {
-            animation: melt 2s ease-out forwards;
-        }
-
         @keyframes gentle-wave {
             0%, 100% { transform: translateY(0px) rotate(0deg); }
             50% { transform: translateY(-10px) rotate(5deg); }
-        }
-
-        @keyframes melt {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(2) translateY(50px); opacity: 0; }
         }
 
         .easter-egg-hint {
@@ -431,6 +422,45 @@
             pointer-events: none;
             z-index: 96;
             animation: fadeIn 0.3s;
+        }
+
+        .completion-marker {
+            position: absolute;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1em;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.5);
+            z-index: 101;
+            animation: popIn 0.5s ease-out;
+            border: 2px solid #34d399;
+        }
+
+        /* Mountain rocks */
+        .mountain-rock {
+            position: absolute;
+            font-size: 50px;
+            cursor: pointer;
+            z-index: 95;
+            transition: all 0.3s;
+            filter: grayscale(0.5) brightness(0.9);
+        }
+
+        .mountain-rock:hover {
+            transform: scale(1.1);
+            filter: grayscale(0) brightness(1.1);
+        }
+
+        .mountain-rock.cracked {
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-5deg); }
+            75% { transform: rotate(5deg); }
         }
     </style>
 </head>
@@ -525,14 +555,17 @@
             </div>
         </section>
 
-        <section class="magic-section quest-content" style="display: none; min-height: 400px;">
+        <section class="magic-section quest-content" style="display: none; min-height: 450px;">
             <h2>🌊 The Mystic Lake</h2>
             <div style="text-align: center; padding: 40px 20px;">
                 <p style="margin-bottom: 20px; font-size: 1.1em;">
                     A serene lake reflects the stars above. Its waters seem to respond to magical energies...
                 </p>
-                <p style="color: #b8a8d8; font-style: italic; font-size: 0.95em;">
+                <p style="color: #b8a8d8; font-style: italic; font-size: 0.95em; margin-bottom: 15px;">
                     "Ancient texts speak of crystals forming when elements clash with nature's gifts."
+                </p>
+                <p style="color: #8b5cf6; font-size: 0.9em;">
+                    💧 Try using your ice and fire spells on the mysterious water...
                 </p>
             </div>
         </section>
@@ -547,12 +580,18 @@
             </div>
         </section>
 
-        <section class="magic-section quest-content" style="display: none; min-height: 500px;">
+        <section class="magic-section quest-content" style="display: none; min-height: 550px;">
             <h2>🏔️ The Ancient Peaks</h2>
             <div style="text-align: center; padding: 40px 20px;">
-                <p style="font-size: 1.1em; line-height: 1.8;">
+                <p style="font-size: 1.1em; line-height: 1.8; margin-bottom: 20px;">
                     Towering mountains pierce the clouds, their peaks shrouded in eternal mist. 
-                    Crystal veins glimmer within the ancient stone...
+                    Ancient boulders rest precariously on the slopes...
+                </p>
+                <p style="color: #b8a8d8; font-style: italic; font-size: 0.95em; margin-bottom: 15px;">
+                    "Legend tells of crystals hidden beneath the stones, released only by the power of thunder."
+                </p>
+                <p style="color: #8b5cf6; font-size: 0.9em;">
+                    ⚡ Perhaps lightning could shatter these ancient rocks...
                 </p>
             </div>
         </section>
@@ -572,9 +611,10 @@
             questsCompleted: [false, false, false, false, false],
             currentRealm: 'default',
             crystalsSpawned: false,
-            waterState: 'liquid', // liquid, frozen, melted
+            waterState: 'liquid',
             easterEggFound: false,
-            lastSpellCast: null
+            lastSpellCast: null,
+            rocksDestroyed: 0
         };
 
         const questStories = [
@@ -620,19 +660,20 @@
             setTimeout(() => {
                 spawnFloatingCrystals();
                 createMysteriousWater();
+                createMountainRocks();
             }, 1000);
         }
 
         function createMysteriousWater() {
             const sections = document.querySelectorAll('.magic-section');
-            const lakeSection = sections[4]; // The Mystic Lake section
+            const lakeSection = sections[4];
             
             const water = document.createElement('div');
             water.className = 'mysterious-water';
             water.textContent = '💧';
             water.id = 'mysterious-water';
             water.style.left = '50%';
-            water.style.top = '60%';
+            water.style.top = '65%';
             water.style.transform = 'translateX(-50%)';
             
             water.onclick = function() {
@@ -648,13 +689,11 @@
 
             if (gameState.waterState === 'liquid') {
                 if (gameState.lastSpellCast === 'ice') {
-                    // Freeze the water
                     gameState.waterState = 'frozen';
                     water.textContent = '🧊';
                     water.classList.add('frozen');
                     showHint(water, "The water has frozen solid! 🧊");
                     
-                    // Create ice particles
                     for (let i = 0; i < 20; i++) {
                         setTimeout(() => {
                             const particle = document.createElement('div');
@@ -673,12 +712,9 @@
                 }
             } else if (gameState.waterState === 'frozen') {
                 if (gameState.lastSpellCast === 'fire') {
-                    // Melt the ice and reveal crystal!
                     gameState.waterState = 'melted';
-                    water.classList.add('melting');
-                    showHint(water, "The ice melts! A crystal emerges! 💎✨");
+                    showHint(water, "The ice melts away! ✨");
                     
-                    // Create melting effect
                     for (let i = 0; i < 15; i++) {
                         setTimeout(() => {
                             const particle = document.createElement('div');
@@ -693,15 +729,101 @@
                     }
                     
                     setTimeout(() => {
-                        water.remove();
-                        // Spawn the secret crystal!
-                        spawnSecretCrystal(water.offsetLeft, water.offsetTop);
-                        gameState.easterEggFound = true;
-                    }, 2000);
+                        water.style.opacity = '0';
+                        setTimeout(() => {
+                            const waterPos = {
+                                left: water.offsetLeft,
+                                top: water.offsetTop
+                            };
+                            water.remove();
+                            spawnSecretCrystal(waterPos.left, waterPos.top + 60);
+                            gameState.easterEggFound = true;
+                        }, 500);
+                    }, 1500);
                 } else {
                     showHint(water, "The ice is solid... Fire might melt it!");
                 }
             }
+        }
+
+        function createMountainRocks() {
+            const sections = document.querySelectorAll('.magic-section');
+            const mountainSection = sections[6];
+            
+            const rockPositions = [
+                { x: '20%', y: '60%', emoji: '🪨' },
+                { x: '50%', y: '65%', emoji: '🗿' },
+                { x: '75%', y: '58%', emoji: '🪨' }
+            ];
+            
+            rockPositions.forEach((pos, index) => {
+                const rock = document.createElement('div');
+                rock.className = 'mountain-rock';
+                rock.textContent = pos.emoji;
+                rock.id = `rock-${index}`;
+                rock.style.left = pos.x;
+                rock.style.top = pos.y;
+                rock.style.transform = 'translateX(-50%)';
+                
+                rock.onclick = function() {
+                    strikeRock(this, index);
+                };
+                
+                mountainSection.appendChild(rock);
+            });
+        }
+
+        function strikeRock(rock, index) {
+            if (gameState.lastSpellCast === 'lightning') {
+                rock.classList.add('cracked');
+                showHint(rock, "⚡ Lightning shatters the rock!");
+                
+                for (let i = 0; i < 25; i++) {
+                    setTimeout(() => {
+                        const particle = document.createElement('div');
+                        particle.className = 'particle';
+                        particle.textContent = ['⚡', '💥', '✨'][Math.floor(Math.random() * 3)];
+                        const angle = (i / 25) * Math.PI * 2;
+                        const distance = 60;
+                        particle.style.left = rock.offsetLeft + rock.offsetWidth / 2 + Math.cos(angle) * distance + 'px';
+                        particle.style.top = rock.offsetTop + rock.offsetHeight / 2 + Math.sin(angle) * distance + 'px';
+                        particle.style.fontSize = '25px';
+                        particle.style.color = '#ffff00';
+                        document.body.appendChild(particle);
+                        setTimeout(() => particle.remove(), 3000);
+                    }, i * 30);
+                }
+                
+                setTimeout(() => {
+                    const rockPos = {
+                        left: rock.offsetLeft,
+                        top: rock.offsetTop
+                    };
+                    rock.remove();
+                    gameState.rocksDestroyed++;
+                    
+                    spawnRockCrystal(rockPos.left, rockPos.top);
+                }, 800);
+            } else {
+                showHint(rock, "The rock is too sturdy... Try lightning!");
+            }
+        }
+
+        function spawnRockCrystal(x, y) {
+            const crystalEmojis = ['💎', '🔷', '✨'];
+            const crystal = document.createElement('div');
+            crystal.className = 'floating-crystal';
+            crystal.textContent = crystalEmojis[gameState.rocksDestroyed % 3];
+            crystal.style.color = '#ffd700';
+            crystal.style.fontSize = '45px';
+            crystal.style.left = x + 'px';
+            crystal.style.top = y + 'px';
+            
+            crystal.onclick = function() {
+                collectFloatingCrystal(this, true);
+            };
+            
+            document.body.appendChild(crystal);
         }
 
         function showHint(element, text) {
@@ -730,10 +852,9 @@
             
             document.body.appendChild(crystal);
 
-            // Show special message
             const hint = document.createElement('div');
             hint.className = 'crystal-hint';
-            hint.textContent = '🎉 Secret Crystal Unlocked! You discovered the elemental puzzle!';
+            hint.textContent = '🎉 Secret Crystal! You solved the ice-fire puzzle!';
             hint.style.background = 'linear-gradient(135deg, #ff00ff, #00ffff)';
             document.body.appendChild(hint);
             setTimeout(() => hint.remove(), 5000);
@@ -748,7 +869,6 @@
             
             const sections = document.querySelectorAll('.magic-section');
             
-            // Spawn crystals in different sections
             const spawnPositions = [
                 { section: 1, x: '15%', y: '150px' },
                 { section: 2, x: '85%', y: '200px' },
@@ -788,7 +908,7 @@
             setTimeout(() => hint.remove(), 4000);
         }
 
-        function collectFloatingCrystal(element, isSecret) {
+        function collectFloatingCrystal(element, isSpecial) {
             gameState.crystalCount++;
             document.getElementById('crystal-count').textContent = gameState.crystalCount;
             
@@ -810,11 +930,28 @@
                 setTimeout(() => sparkle.remove(), 3000);
             }
             
+            const crystalPos = {
+                left: element.offsetLeft,
+                top: element.offsetTop
+            };
+            
             setTimeout(() => {
                 element.remove();
+                
+                const marker = document.createElement('div');
+                marker.className = 'completion-marker';
+                marker.textContent = isSpecial ? '✅ Secret Discovered!' : '✅ Crystal Found!';
+                marker.style.left = crystalPos.left + 'px';
+                marker.style.top = crystalPos.top + 'px';
+                document.body.appendChild(marker);
+                
+                setTimeout(() => {
+                    marker.style.opacity = '0';
+                    setTimeout(() => marker.remove(), 500);
+                }, 2000);
             }, 600);
 
-            if (isSecret) {
+            if (isSpecial) {
                 const hint = document.createElement('div');
                 hint.className = 'crystal-hint';
                 hint.textContent = '🏆 Bonus Crystal! +1';

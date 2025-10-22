@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mystic Realm - Your Fantasy Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #1a0933 0%, #2d1b4e 50%, #1a0933 100%);
+            color: #e0d4f7;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated stars */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        h1 {
+            font-size: 3.5em;
+            color: #ffd700;
+            text-shadow: 0 0 20px #ffd700, 0 0 40px #ff8c00;
+            margin-bottom: 10px;
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 20px #ffd700, 0 0 40px #ff8c00; }
+            50% { text-shadow: 0 0 30px #ffd700, 0 0 60px #ff8c00, 0 0 80px #ffd700; }
+        }
+
+        .subtitle {
+            font-size: 1.3em;
+            color: #b8a8d8;
+            font-style: italic;
+        }
+
+        .magic-section {
+            background: rgba(45, 27, 78, 0.6);
+            border: 2px solid #8b5cf6;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        h2 {
+            color: #a78bfa;
+            margin-bottom: 20px;
+            font-size: 2em;
+            text-align: center;
+        }
+
+        /* Spell casting area */
+        .spell-casting {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spell-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        .spell-btn {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+            font-family: 'Georgia', serif;
+        }
+
+        .spell-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 25px rgba(139, 92, 246, 0.6);
+            background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+        }
+
+        .spell-btn:active {
+            transform: scale(0.95);
+        }
+
+        #spell-result {
+            min-height: 60px;
+            margin-top: 20px;
+            font-size: 1.3em;
+            color: #ffd700;
+            text-shadow: 0 0 10px #ffd700;
+        }
+
+        /* Crystal collector game */
+        .crystal-game {
+            text-align: center;
+        }
+
+        .crystals-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin: 30px 0;
+        }
+
+        .crystal {
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            transition: all 0.3s;
+            filter: drop-shadow(0 0 10px currentColor);
+        }
+
+        .crystal:hover {
+            transform: scale(1.2) rotate(10deg);
+        }
+
+        .score {
+            font-size: 1.5em;
+            color: #ffd700;
+            margin: 20px 0;
+        }
+
+        /* Magic portal */
+        .portal {
+            width: 200px;
+            height: 200px;
+            margin: 30px auto;
+            border-radius: 50%;
+            background: radial-gradient(circle, #8b5cf6 0%, #2d1b4e 70%);
+            border: 3px solid #a78bfa;
+            animation: portal-spin 10s linear infinite;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.8), inset 0 0 40px rgba(139, 92, 246, 0.5);
+        }
+
+        .portal:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 60px rgba(139, 92, 246, 1), inset 0 0 60px rgba(139, 92, 246, 0.7);
+        }
+
+        @keyframes portal-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        #portal-message {
+            text-align: center;
+            font-size: 1.2em;
+            color: #a78bfa;
+            margin-top: 20px;
+            min-height: 30px;
+        }
+
+        /* Quest log */
+        .quest-list {
+            list-style: none;
+            margin-top: 20px;
+        }
+
+        .quest-item {
+            background: rgba(139, 92, 246, 0.2);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #8b5cf6;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quest-item:hover {
+            background: rgba(139, 92, 246, 0.4);
+            transform: translateX(10px);
+        }
+
+        .quest-item.completed {
+            opacity: 0.6;
+            text-decoration: line-through;
+            border-left-color: #10b981;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            color: #b8a8d8;
+            font-style: italic;
+        }
+
+        /* Particle effects */
+        .particle {
+            position: fixed;
+            pointer-events: none;
+            animation: float-up 3s ease-out forwards;
+        }
+
+        @keyframes float-up {
+            to {
+                transform: translateY(-100vh) scale(0);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    
+    <div class="container">
+        <header>
+            <h1>⚔️ Mystic Realm ⚔️</h1>
+            <p class="subtitle">Welcome, Wanderer of the Arcane</p>
+        </header>
+
+        <!-- Spell Casting Section -->
+        <section class="magic-section">
+            <h2>🔮 Cast Your Spells</h2>
+            <div class="spell-casting">
+                <p>Choose a spell to cast and witness the magic unfold!</p>
+                <div class="spell-buttons">
+                    <button class="spell-btn" onclick="castSpell('fire')">🔥 Fireball</button>
+                    <button class="spell-btn" onclick="castSpell('ice')">❄️ Ice Blast</button>
+                    <button class="spell-btn" onclick="castSpell('lightning')">⚡ Lightning Strike</button>
+                    <button class="spell-btn" onclick="castSpell('healing')">💚 Healing Light</button>
+                </div>
+                <div id="spell-result"></div>
+            </div>
+        </section>
+
+        <!-- Crystal Collector Game -->
+        <section class="magic-section">
+            <h2>💎 Crystal Collector</h2>
+            <div class="crystal-game">
+                <p>Click the mystical crystals to collect them!</p>
+                <div class="score">Crystals Collected: <span id="crystal-count">0</span></div>
+                <div class="crystals-container" id="crystals"></div>
+                <button class="spell-btn" onclick="resetCrystals()">Reset Crystals</button>
+            </div>
+        </section>
+
+        <!-- Magic Portal -->
+        <section class="magic-section">
+            <h2>🌀 The Portal</h2>
+            <p style="text-align: center;">Click the swirling portal to travel to distant realms...</p>
+            <div class="portal" onclick="enterPortal()"></div>
+            <div id="portal-message"></div>
+        </section>
+
+        <!-- Quest Log -->
+        <section class="magic-section">
+            <h2>📜 Quest Log</h2>
+            <p style="text-align: center;">Click on quests to mark them as complete!</p>
+            <ul class="quest-list">
+                <li class="quest-item" onclick="toggleQuest(this)">
+                    <strong>Quest:</strong> Collect 10 Mystical Crystals
+                </li>
+                <li class="quest-item" onclick="toggleQuest(this)">
+                    <strong>Quest:</strong> Cast all four elemental spells
+                </li>
+                <li class="quest-item" onclick="toggleQuest(this)">
+                    <strong>Quest:</strong> Enter the portal five times
+                </li>
+                <li class="quest-item" onclick="toggleQuest(this)">
+                    <strong>Quest:</strong> Explore every section of the realm
+                </li>
+            </ul>
+        </section>
+
+        <footer>
+            <p>✨ May your journey through the Mystic Realm be filled with wonder ✨</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">Created with magic and code</p>
+        </footer>
+    </div>
+
+    <script>
+        // Create animated stars
+        const starsContainer = document.getElementById('stars');
+        for (let i = 0; i < 100; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.width = Math.random() * 3 + 'px';
+            star.style.height = star.style.width;
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 3 + 's';
+            starsContainer.appendChild(star);
+        }
+
+        // Spell casting functionality
+        const spellMessages = {
+            fire: [
+                "🔥 A mighty fireball erupts from your hands!",
+                "🔥 Flames dance around you, warming the realm!",
+                "🔥 Your fire magic burns bright and fierce!"
+            ],
+            ice: [
+                "❄️ Icy crystals form in the air around you!",
+                "❄️ A freezing blast chills the atmosphere!",
+                "❄️ Winter's embrace flows through your magic!"
+            ],
+            lightning: [
+                "⚡ Thunder crashes as lightning strikes!",
+                "⚡ Electric energy crackles through the air!",
+                "⚡ The power of the storm courses through you!"
+            ],
+            healing: [
+                "💚 A warm, soothing light envelops you!",
+                "💚 Life energy flows through the realm!",
+                "💚 Your healing magic brings peace and renewal!"
+            ]
+        };
+
+        function castSpell(spellType) {
+            const messages = spellMessages[spellType];
+            const message = messages[Math.floor(Math.random() * messages.length)];
+            const resultDiv = document.getElementById('spell-result');
+            
+            resultDiv.style.animation = 'none';
+            setTimeout(() => {
+                resultDiv.textContent = message;
+                resultDiv.style.animation = 'glow 1s ease-in-out 3';
+            }, 10);
+
+            createParticles(spellType);
+        }
+
+        function createParticles(type) {
+            const colors = {
+                fire: ['#ff4500', '#ff8c00', '#ffd700'],
+                ice: ['#00ffff', '#87ceeb', '#ffffff'],
+                lightning: ['#ffff00', '#ffffff', '#9370db'],
+                healing: ['#00ff00', '#90ee90', '#98fb98']
+            };
+
+            const emojis = {
+                fire: '🔥',
+                ice: '❄️',
+                lightning: '⚡',
+                healing: '💚'
+            };
+
+            for (let i = 0; i < 15; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.textContent = emojis[type];
+                    particle.style.left = Math.random() * window.innerWidth + 'px';
+                    particle.style.top = window.innerHeight - 100 + 'px';
+                    particle.style.fontSize = Math.random() * 20 + 20 + 'px';
+                    particle.style.color = colors[type][Math.floor(Math.random() * colors[type].length)];
+                    document.body.appendChild(particle);
+
+                    setTimeout(() => particle.remove(), 3000);
+                }, i * 100);
+            }
+        }
+
+        // Crystal collector game
+        let crystalCount = 0;
+        const crystalEmojis = ['💎', '💠', '🔷', '🔹', '💙', '💜'];
+        
+        function createCrystals() {
+            const container = document.getElementById('crystals');
+            container.innerHTML = '';
+            
+            for (let i = 0; i < 12; i++) {
+                const crystal = document.createElement('div');
+                crystal.className = 'crystal';
+                crystal.textContent = crystalEmojis[Math.floor(Math.random() * crystalEmojis.length)];
+                crystal.style.color = `hsl(${Math.random() * 360}, 70%, 60%)`;
+                crystal.onclick = function() {
+                    collectCrystal(this);
+                };
+                container.appendChild(crystal);
+            }
+        }
+
+        function collectCrystal(element) {
+            crystalCount++;
+            document.getElementById('crystal-count').textContent = crystalCount;
+            
+            // Animate collection
+            element.style.transition = 'all 0.5s';
+            element.style.transform = 'scale(2) translateY(-50px)';
+            element.style.opacity = '0';
+            
+            setTimeout(() => {
+                element.remove();
+            }, 500);
+
+            // Create sparkles
+            for (let i = 0; i < 5; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'particle';
+                sparkle.textContent = '✨';
+                sparkle.style.left = element.offsetLeft + element.offsetWidth / 2 + 'px';
+                sparkle.style.top = element.offsetTop + element.offsetHeight / 2 + 'px';
+                sparkle.style.fontSize = '20px';
+                document.body.appendChild(sparkle);
+                setTimeout(() => sparkle.remove(), 3000);
+            }
+        }
+
+        function resetCrystals() {
+            createCrystals();
+        }
+
+        // Portal functionality
+        let portalVisits = 0;
+        const realms = [
+            "You've entered the Ethereal Forest! Ancient trees whisper secrets...",
+            "Welcome to the Crystal Caverns! Gems glitter in every direction...",
+            "You've arrived at the Floating Islands! Clouds drift beneath your feet...",
+            "The Shadow Realm embraces you! Mysterious figures lurk in the darkness...",
+            "You stand in the Temple of Light! Divine energy fills the air...",
+            "The Dragon's Peak! A mighty roar echoes through the mountains...",
+            "The Starfall Plains stretch before you! Meteorites paint the sky...",
+            "You've found the Enchanted Library! Infinite knowledge awaits..."
+        ];
+
+        function enterPortal() {
+            portalVisits++;
+            const realm = realms[Math.floor(Math.random() * realms.length)];
+            const messageDiv = document.getElementById('portal-message');
+            
+            messageDiv.textContent = realm;
+            messageDiv.style.animation = 'glow 2s ease-in-out';
+            
+            // Create portal particles
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.textContent = '🌟';
+                    particle.style.left = window.innerWidth / 2 + 'px';
+                    particle.style.top = '50%';
+                    particle.style.fontSize = Math.random() * 30 + 20 + 'px';
+                    document.body.appendChild(particle);
+                    setTimeout(() => particle.remove(), 3000);
+                }, i * 50);
+            }
+        }
+
+        // Quest functionality
+        function toggleQuest(element) {
+            element.classList.toggle('completed');
+        }
+
+        // Initialize crystals on page load
+        createCrystals();
+    </script>
+</body>
+</html>
